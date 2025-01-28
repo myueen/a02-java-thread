@@ -7,7 +7,9 @@ In this assignment, we will represent fork, spagehetti, table, and philospher as
 
 1. Fork - Java Class 
     - Fields: 
-        - pickup: boolean 
+        - pickedUp: boolean 
+    - Methods:
+        - pickUpFork()
 
 
 2. Spagehetti - Java Class 
