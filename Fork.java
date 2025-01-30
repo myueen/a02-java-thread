@@ -1,11 +1,15 @@
 public class Fork {
-    boolean pickedUp; 
+    boolean pickedUp;
 
     public Fork() {
         this.pickedUp = false;
     }
 
-    public void pickUpFork() {
-        this.pickedUp = true; 
+    synchronized public void pickUpFork() {
+        this.pickedUp = true;
+    }
+
+    synchronized public void putDownFork() {
+        this.pickedUp = false;
     }
 }
