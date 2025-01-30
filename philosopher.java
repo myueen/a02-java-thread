@@ -1,4 +1,4 @@
-class Philosopher {
+public class Philosopher {
     public bool think;
     public bool eat;
     public Fork leftFork;
