@@ -4,7 +4,7 @@ public class Philosopher {
     public Fork leftFork;
     public Fork rightFork;
 
-    Philosopher(int position, Fork leftFork, Fork rightFork) {
+    Philosopher(Fork leftFork, Fork rightFork) {
         think = true;
         eat = false;
         this.leftFork = leftFork;
