@@ -46,23 +46,24 @@ public class Philosopher extends Thread {
     public void tryToEat() throws InterruptedException {
         synchronized (lock) {
             int philosopherIndex = philosopherNumber - 1;
-            if (canEat()) {
-                leftFork.pickUpFork();
-                rightFork.pickUpFork();
-                startEat();
-                leftFork.putDownFork();
-                rightFork.putDownFork();
-                spaghetti[philosopherIndex] = false;   // mark as eaten this round 
-                checkWaitingPhilosopher();
-            } else {
+            if (!canEat()) {
                 System.out.println("Philosopher " + philosopherNumber + " is waiting.");
                 if (!waitingStack.contains(this)) {
                     waitingStack.push(this);
                 }
-                
-                // wait until lock is notified
-                lock.wait();    
             }
+            while (!canEat()) {
+                Thread.sleep(10);
+                //lock.wait();
+                //System.out.println("Philosopher " + philosopherNumber + " is checking if they can eat.");
+            }
+            leftFork.pickUpFork();
+            rightFork.pickUpFork();
+            startEat();
+            leftFork.putDownFork();
+            rightFork.putDownFork();
+            spaghetti[philosopherIndex] = false;   // mark as eaten this round 
+            //checkWaitingPhilosopher();
 
             // if all philosophers have eaten, reset spaghetti 
             if (allSpaghettiEmpty()) {
@@ -86,7 +87,7 @@ public class Philosopher extends Thread {
         synchronized (lock) {
             if (!waitingStack.isEmpty()) {
             // notifying waiting philosophers to check if they can eat. 
-              notifyAll();   
+              notifyAll();
             } 
         }
     }
@@ -107,7 +108,7 @@ public class Philosopher extends Thread {
                 spaghetti[i] = true;
             }
     
-            notifyAll();   
+            //notifyAll();   
         } 
     }
 
