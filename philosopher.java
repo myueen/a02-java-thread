@@ -1,4 +1,7 @@
 // Philosopher.java
+
+import java.util.Stack;
+
 public class Philosopher extends Thread {
     public boolean think;
     public boolean eat;
@@ -6,14 +9,17 @@ public class Philosopher extends Thread {
     private Fork rightFork;
     private boolean[] spaghetti;  // Shared spaghetti array
     private int philosopherNumber;  // 1-5 for philosopher number
+    private Stack<Philosopher> waitingStack;    // waiting philosopher in line to eat next 
+    private final Object lock = new Object();
     
-    public Philosopher(Fork leftFork, Fork rightFork, int philosopherNumber, boolean[] spaghetti) {
+    public Philosopher(Fork leftFork, Fork rightFork, int philosopherNumber, boolean[] spaghetti, Stack<Philosopher> waitingStack) {
         think = true;
         eat = false;
         this.leftFork = leftFork;
         this.rightFork = rightFork;
         this.spaghetti = spaghetti;
         this.philosopherNumber = philosopherNumber;
+        this.waitingStack = waitingStack; 
     }
     
     @Override
@@ -21,7 +27,7 @@ public class Philosopher extends Thread {
         try {
             while (true) {
                 startThink();
-                startEat();
+                tryToEat();            
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -35,63 +41,84 @@ public class Philosopher extends Thread {
         Thread.sleep(5000 + (long)(Math.random() * 5000));
         think = false;
     }
+
+
+    public void tryToEat() throws InterruptedException {
+        synchronized (lock) {
+            int philosopherIndex = philosopherNumber - 1;
+            if (!canEat()) {
+                System.out.println("Philosopher " + philosopherNumber + " is waiting.");
+                if (!waitingStack.contains(this)) {
+                    waitingStack.push(this);
+                }
+            }
+            while (!canEat()) {
+                Thread.sleep(10);
+                //lock.wait();
+                //System.out.println("Philosopher " + philosopherNumber + " is checking if they can eat.");
+            }
+            leftFork.pickUpFork();
+            rightFork.pickUpFork();
+            startEat();
+            leftFork.putDownFork();
+            rightFork.putDownFork();
+            spaghetti[philosopherIndex] = false;   // mark as eaten this round 
+            //checkWaitingPhilosopher();
+
+            // if all philosophers have eaten, reset spaghetti 
+            if (allSpaghettiEmpty()) {
+                resetSpaghetti();
+            }
+        }
+    }
+
+    public boolean canEat() {
+        int philosopherIndex = philosopherNumber - 1;
+        int leftNeighbor = (philosopherNumber + 4) % 5;
+        int rightNeighbor = (philosopherNumber + 1) % 5; 
+
+        // The spaghetti in front of this philosopher has not emptied, and either the left neighbor
+        // has not start eating their spaghetti, or they have done eating and the fork is putDown, and 
+        // same for the right neighbor. 
+        return spaghetti[philosopherIndex] && (!spaghetti[leftNeighbor] || !leftFork.isInUse()) && (!spaghetti[rightNeighbor] || !rightFork.isInUse());
+    }
+
+    private void checkWaitingPhilosopher() {
+        synchronized (lock) {
+            if (!waitingStack.isEmpty()) {
+            // notifying waiting philosophers to check if they can eat. 
+              notifyAll();
+            } 
+        }
+    }
+
+    private boolean allSpaghettiEmpty() {
+        // Check if all philosophers have eaten
+        for (boolean hasSpaghetti: spaghetti) {
+            if (hasSpaghetti) return false; 
+        }
+        return true;
+    }
+
+    private void resetSpaghetti() {
+        // If all have eaten, reset the spaghetti array
+        synchronized (lock) {
+            System.out.println("All philosophers have eaten! Resetting...");
+            for (int i = 0; i < spaghetti.length; i++) {
+                spaghetti[i] = true;
+            }
+    
+            //notifyAll();   
+        } 
+    }
+
     
     public synchronized void startEat() throws InterruptedException {
-        // Convert philosopher number to array index (0-4)
-        int arrayIndex = philosopherNumber - 1;
-        
-        // Check if all other philosophers have eaten before eating again
-        if (spaghetti[arrayIndex]) {
-            boolean allOthersHaveEaten = true;
-            for (int i = 0; i < spaghetti.length; i++) {
-                if (i != arrayIndex && !spaghetti[i]) {
-                    allOthersHaveEaten = false;
-                    break;
-                }
-            }
-            if (!allOthersHaveEaten) {
-                return; // Wait for others to eat first
-            }
-        }
-        
-        // Try to pick up forks
-        if (!leftFork.pickedUp && !rightFork.pickedUp) {
-            pickUpFork(leftFork);
-            pickUpFork(rightFork);
-            
-            eat = true;
-            System.out.println("Philosopher " + philosopherNumber + " has started eating");
-            spaghetti[arrayIndex] = true; // Mark that this philosopher has eaten
-            
-            // Check if all philosophers have eaten
-            boolean allHaveEaten = true;
-            for (boolean eaten : spaghetti) {
-                if (!eaten) {
-                    allHaveEaten = false;
-                    break;
-                }
-            }
-            
-            // If all have eaten, reset the spaghetti array
-            if (allHaveEaten) {
-                System.out.println("All philosophers have eaten! Resetting...");
-                for (int i = 0; i < spaghetti.length; i++) {
-                    spaghetti[i] = false;
-                }
-            }
-            
+        System.out.println("Philospher " + philosopherNumber + " has started eating.");
+        try {
             Thread.sleep(5000 + (long)(Math.random() * 5000));
-            eat = false;
-            putDownFork(leftFork);
-            putDownFork(rightFork);
-        }
-    }
-    
-    public synchronized void pickUpFork(Fork fork) {
-        fork.pickUpFork();
-    }
-    
-    public synchronized void putDownFork(Fork fork) {
-        fork.putDownFork();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }  
     }
 }

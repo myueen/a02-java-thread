@@ -1,15 +1,30 @@
 public class Fork {
-    boolean pickedUp; 
+    private boolean inUse; 
     
     public Fork() {
-        this.pickedUp = false;
+        this.inUse = false;
     }
     
     public synchronized void pickUpFork() {
-        this.pickedUp = true; 
+        // If the fork is being use, then the neighbor philosopher has to wait. 
+        while (inUse) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        this.inUse = true; 
     }
     
     public synchronized void putDownFork() {
-        this.pickedUp = false;
+        this.inUse = false;
+        notifyAll();
     }
+
+    public synchronized boolean isInUse() {
+        return this.inUse;
+    }
+
+
 }

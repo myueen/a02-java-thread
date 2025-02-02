@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 public class Main {
     public static void main(String[] args) {
         Fork f1 = new Fork();
@@ -6,18 +8,21 @@ public class Main {
         Fork f4 = new Fork();
         Fork f5 = new Fork();
         
-        // Initialize spaghetti array - false means hasn't eaten
+        // Initialize spaghetti array - true means spaghetti still on the table.
         boolean[] spaghetti = new boolean[5];
         for (int i = 0; i < 5; i++) {
-            spaghetti[i] = false;
+            spaghetti[i] = true;        
         }
-        
+
+        // Waiting Stack
+        Stack<Philosopher> waitingStack = new Stack<>();
+
         // Create philosophers with numbers 1-5
-        Philosopher p1 = new Philosopher(f2, f1, 1, spaghetti);
-        Philosopher p2 = new Philosopher(f3, f2, 2, spaghetti);
-        Philosopher p3 = new Philosopher(f4, f3, 3, spaghetti);
-        Philosopher p4 = new Philosopher(f5, f4, 4, spaghetti);
-        Philosopher p5 = new Philosopher(f1, f5, 5, spaghetti);
+        Philosopher p1 = new Philosopher(f2, f1, 1, spaghetti, waitingStack);
+        Philosopher p2 = new Philosopher(f3, f2, 2, spaghetti, waitingStack);
+        Philosopher p3 = new Philosopher(f4, f3, 3, spaghetti, waitingStack);
+        Philosopher p4 = new Philosopher(f5, f4, 4, spaghetti, waitingStack);
+        Philosopher p5 = new Philosopher(f1, f5, 5, spaghetti, waitingStack);
         
         // Start all philosopher threads
         p1.start();
@@ -28,7 +33,7 @@ public class Main {
         
         // Let the simulation run for a while
         try {
-            Thread.sleep(60000); // Run for 1 minute
+            Thread.sleep(120000); // Run for 1 minute
             p1.interrupt();
             p2.interrupt();
             p3.interrupt();
