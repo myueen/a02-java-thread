@@ -61,11 +61,7 @@ public class Philosopher extends Thread {
                 }
                 
                 // wait until lock is notified
-                try {
-                    lock.wait();    
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+                lock.wait();    
             }
 
             // if all philosophers have eaten, reset spaghetti 
@@ -87,10 +83,10 @@ public class Philosopher extends Thread {
     }
 
     private void checkWaitingPhilosopher() {
-        if (!waitingStack.isEmpty()) {
+        synchronized (lock) {
+            if (!waitingStack.isEmpty()) {
             // notifying waiting philosophers to check if they can eat. 
-            synchronized (lock) {
-                notifyAll();   
+              notifyAll();   
             } 
         }
     }
@@ -105,18 +101,19 @@ public class Philosopher extends Thread {
 
     private void resetSpaghetti() {
         // If all have eaten, reset the spaghetti array
-        System.out.println("All philosophers have eaten! Resetting...");
-        for (int i = 0; i < spaghetti.length; i++) {
-            spaghetti[i] = true;
-        }
         synchronized (lock) {
-                notifyAll();   
+            System.out.println("All philosophers have eaten! Resetting...");
+            for (int i = 0; i < spaghetti.length; i++) {
+                spaghetti[i] = true;
+            }
+    
+            notifyAll();   
         } 
     }
 
     
     public synchronized void startEat() throws InterruptedException {
-        System.out.println("Philospher" + philosopherNumber + " has started eating.");
+        System.out.println("Philospher " + philosopherNumber + " has started eating.");
         try {
             Thread.sleep(5000 + (long)(Math.random() * 5000));
         } catch (InterruptedException e) {

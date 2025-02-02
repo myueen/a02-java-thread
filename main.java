@@ -16,10 +16,7 @@ public class Main {
 
         // Waiting Stack
         Stack<Philosopher> waitingStack = new Stack<>();
-        
-        // Lock 
-        // final Object lock = new Object();
-        
+
         // Create philosophers with numbers 1-5
         Philosopher p1 = new Philosopher(f2, f1, 1, spaghetti, waitingStack);
         Philosopher p2 = new Philosopher(f3, f2, 2, spaghetti, waitingStack);
