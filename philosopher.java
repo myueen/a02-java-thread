@@ -81,7 +81,7 @@ public class Philosopher extends Thread {
 
         // The spaghetti in front of this philosopher has not emptied, and either the left neighbor
         // has not start eating their spaghetti, or they have done eating and the fork is putDown, and 
-        //same for the right neighbor. 
+        // same for the right neighbor. 
         return spaghetti[philosopherNumber] && (!spaghetti[leftNeighbor] || !leftFork.isInUse()) && (!spaghetti[rightNeighbor] || !rightFork.isInUse());
     }
 
