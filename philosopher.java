@@ -10,9 +10,9 @@ public class Philosopher extends Thread {
     private boolean[] spaghetti;  // Shared spaghetti array
     private int philosopherNumber;  // 1-5 for philosopher number
     private Stack<Philosopher> waitingStack;    // waiting philosopher in line to eat next 
-    private final Object lock;
+    private final Object lock = new Object();
     
-    public Philosopher(Fork leftFork, Fork rightFork, int philosopherNumber, boolean[] spaghetti, Stack<Philosopher> waitingStack, Object lock) {
+    public Philosopher(Fork leftFork, Fork rightFork, int philosopherNumber, boolean[] spaghetti, Stack<Philosopher> waitingStack) {
         think = true;
         eat = false;
         this.leftFork = leftFork;
@@ -20,7 +20,6 @@ public class Philosopher extends Thread {
         this.spaghetti = spaghetti;
         this.philosopherNumber = philosopherNumber;
         this.waitingStack = waitingStack; 
-        this.lock = lock;
     }
     
     @Override
@@ -45,14 +44,15 @@ public class Philosopher extends Thread {
 
 
     public void tryToEat() throws InterruptedException {
-        synchronized (spaghetti) {
+        synchronized (lock) {
+            int philosopherIndex = philosopherNumber - 1;
             if (canEat()) {
                 leftFork.pickUpFork();
                 rightFork.pickUpFork();
                 startEat();
                 leftFork.putDownFork();
                 rightFork.putDownFork();
-                spaghetti[philosopherNumber] = false;   // mark as eaten this round 
+                spaghetti[philosopherIndex] = false;   // mark as eaten this round 
                 checkWaitingPhilosopher();
             } else {
                 System.out.println("Philosopher " + philosopherNumber + " is waiting.");
@@ -76,19 +76,22 @@ public class Philosopher extends Thread {
     }
 
     public boolean canEat() {
+        int philosopherIndex = philosopherNumber - 1;
         int leftNeighbor = (philosopherNumber + 4) % 5;
         int rightNeighbor = (philosopherNumber + 1) % 5; 
 
         // The spaghetti in front of this philosopher has not emptied, and either the left neighbor
         // has not start eating their spaghetti, or they have done eating and the fork is putDown, and 
         // same for the right neighbor. 
-        return spaghetti[philosopherNumber] && (!spaghetti[leftNeighbor] || !leftFork.isInUse()) && (!spaghetti[rightNeighbor] || !rightFork.isInUse());
+        return spaghetti[philosopherIndex] && (!spaghetti[leftNeighbor] || !leftFork.isInUse()) && (!spaghetti[rightNeighbor] || !rightFork.isInUse());
     }
 
     private void checkWaitingPhilosopher() {
         if (!waitingStack.isEmpty()) {
             // notifying waiting philosophers to check if they can eat. 
-            lock.notifyAll();       
+            synchronized (lock) {
+                notifyAll();   
+            } 
         }
     }
 
@@ -106,7 +109,9 @@ public class Philosopher extends Thread {
         for (int i = 0; i < spaghetti.length; i++) {
             spaghetti[i] = true;
         }
-        lock.notifyAll();
+        synchronized (lock) {
+                notifyAll();   
+        } 
     }
 
     
