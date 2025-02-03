@@ -1,9 +1,17 @@
 # a02-java-thread
-COMP 590 Assignment 02 Java Thread Dining Philosophers problem
+COMP 590 Assignment 02: Java Thread Dining Philosophers Problem
 
-In the Dining Philosophers problem, there are five philosopher sitting around a table. Each philospher can have one plate of spagehetti. However, there are only five forks on the table. All of the philosphers are either in the thinking or eating state. 
+## Team Members & PID
+- Edlyn Jeyaraj (730569503)
+- Thomas Kung (730620459)
+- Yueen Ma (730572152)
 
-In this assignment, we will represent fork, spagehetti, table, and philospher as follows. 
+
+## Problem 
+
+In the Dining Philosophers problem, five philosophers sit around a circular table. Each philosopher has their own plate at the table. Between each pair of philosophers is a single fork, for a total of five forks. Each philosopher alternates between thinking and eating states. To eat their spaghetti, a philosopher needs to acquire both forks adjacent to them. After eating, they put down both forks and return to thinking. A philosopher can only use the forks to their immediate left and right.
+
+In this assignment, we will represent the fork, the spaghetti, the table, and the philosophers as follows. 
 
 1. Fork - Java Class 
     - Fields: 
@@ -12,17 +20,14 @@ In this assignment, we will represent fork, spagehetti, table, and philospher as
     - Methods:
         - pickUpFork()
         - putDownFork()
-        - isInUsed()
+        - isInUse()
 
+2. Spaghetti - Boolean array
+    - true: Spaghetti has not been eaten.
+    - false: Spaghetti has been eaten.
 
-2. Spagehetti - Boolean array
-    - true: spaghetti has not emptied
-    - false: spaghetti has emptied (i.e., eaten by a philosopher)
-
-
-3. Table - Philosopher array
-    - an array storing all five philosopher. 
-
+3. Table 
+    - All five philosophers.
 
 4. Philosopher - Java Class extends Thread
     - Fields: 
@@ -37,22 +42,20 @@ In this assignment, we will represent fork, spagehetti, table, and philospher as
 
     - Methods: 
         - run()
-        - startThinking()
+        - startThink()
         - tryToEat()
         - canEat()
         - allSpaghettiEmpty()
         - resetSpaghetti()
         - startEat()
 
-
-
-In the dining philospher problem, we have a Philosopherr class, a Fork class, and Main.java file. Our goal is to have more than one philosopher eating at the same time. The eating phase of the philosopher is when the method startEat() is called, and the thinking phase is the waiting to eat phase. 
+We have a Philosopher class, a Fork class, and a Main.java file. Our goal is to have more than one philosopher eating at the same time. The eating phase of the philosopher is when the method startEat() is called, and the thinking phase occurs whenever the philosopher is not eating. 
 
 ### Race Condition
-When two philosopher trying to grab the same fork, it results in a race condition. To avoid this, we use synchronized keywords in methods like tryingToEat() and startEat() to make sure only one thread (philosopher) execute the method at a time. 
+When two philosophers are trying to grab the same fork, it results in a race condition. To avoid this, we use synchronized keywords in methods like tryingToEat() and startEat() to make sure only one thread (philosopher) can execute the method at a time. 
 
 ### Deadlock 
-When a philosopher grabs the left fork and the neighboring two philosophers also grabs the left fork, none of the three philosopher can start eating because they all need a fork from each other. To avoid such deadlock, we make sure each philosopher must pick up both left fork and right fork when they are able to eat the spaghetti. Therefore, either a philosopher is eating with both forks, or thinking where both forks are on the table available to be pickuped. 
+When a philosopher grabs the left fork and the neighboring two philosophers also grab the left fork, none of the three philosophers can start eating since they all need a fork from each other. To avoid such a deadlock, we made sure each philosopher had to pick up both the left fork and the right fork when trying to eat. A philosopher is eating with both forks or thinking with both forks put down.
 
 ### Starvation
-Since every philosopher thinks a random amount of time and then starts eating, it is possible that some philosopher always get to eat with both forks while the other never have a chance to eat. To avoid starving some philosopher, we use Stack to store philosopher that are not able to eat and a spaghetti boolean array to make sure all philosophers have a chance to eat. Specifically, when one philosopher is eating, the left philosopher and right philosopher are not able to eat. Thus they are put into the Stack to wait. Futhermore, if one philosopher has eaten the spaghetti (i.e., spaghetti become false), it is not allowed to eat again unless everyone else has finished eating the spaghetti. This philosopher is put into the Stack as well. When everyone is done eating the spaghetti, the spaghetti boolean array all become true (i.e., spaghetti is refilled). And the cycles continues. This allows all philosopher to have eat the spaghetti without starving any philosopher.
+Since every philosopher thinks for a random amount of time and then starts eating, a philosopher may always get to eat with both forks while the others never have a chance to eat. To avoid starving philosophers, we used the Stack to store philosophers who are not able to eat, along with a spaghetti boolean array that keeps track of the philosophers who have eaten. For example, when one philosopher is eating, the left philosopher and the right philosopher cannot eat. Thus, they are put into the Stack to wait. Furthermore, if one philosopher has eaten the spaghetti (i.e., spaghetti becomes false), he/she is not allowed to eat again unless everyone else has finished eating their spaghetti. This philosopher is put into the Stack as well. When everyone is done eating, the entire spaghetti boolean array becomes true (i.e., spaghetti is refilled). Then, the cycle continues. This allows all philosophers to have eaten the spaghetti without starving anybody.
