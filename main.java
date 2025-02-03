@@ -18,12 +18,15 @@ public class Main {
         Stack<Philosopher> waitingStack = new Stack<>();
 
         // Create philosophers with numbers 1-5
+        
         Philosopher p1 = new Philosopher(f2, f1, 1, spaghetti, waitingStack);
         Philosopher p2 = new Philosopher(f3, f2, 2, spaghetti, waitingStack);
         Philosopher p3 = new Philosopher(f4, f3, 3, spaghetti, waitingStack);
         Philosopher p4 = new Philosopher(f5, f4, 4, spaghetti, waitingStack);
         Philosopher p5 = new Philosopher(f1, f5, 5, spaghetti, waitingStack);
         
+        Philosopher[] table = {p1, p2, p3, p4, p5};
+
         // Start all philosopher threads
         p1.start();
         p2.start();
