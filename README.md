@@ -20,8 +20,8 @@ In this assignment, we will represent fork, spagehetti, table, and philospher as
     - false: spaghetti has emptied (i.e., eaten by a philosopher)
 
 
-3. Table 
-    - all five philosopher. 
+3. Table - Philosopher array
+    - an array storing all five philosopher. 
 
 
 4. Philosopher - Java Class extends Thread
