@@ -46,7 +46,7 @@ In this assignment, we will represent fork, spagehetti, table, and philospher as
 
 
 
-In the dining philospher problem, we have a Philosopherr class, a Fork class, and Main.java file. Our goal is to have more than one philosopher eating at the same time. 
+In the dining philospher problem, we have a Philosopherr class, a Fork class, and Main.java file. Our goal is to have more than one philosopher eating at the same time. The eating phase of the philosopher is when the method startEat() is called, and the thinking phase is the waiting to eat phase. 
 
 ### Race Condition
 When two philosopher trying to grab the same fork, it results in a race condition. To avoid this, we use synchronized keywords in methods like tryingToEat() and startEat() to make sure only one thread (philosopher) execute the method at a time. 
