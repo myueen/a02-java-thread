@@ -19,7 +19,7 @@ In this assignment, we will represent the fork, the spaghetti, the table, and th
     - false: Spaghetti has been eaten.
 
 3. Table 
-    - all five philosopher. 
+    - All five philosophers.
 
 4. Philosopher - Java Class extends Thread
     - Fields: 
@@ -47,7 +47,7 @@ We have a Philosopher class, a Fork class, and a Main.java file. Our goal is to 
 When two philosophers are trying to grab the same fork, it results in a race condition. To avoid this, we use synchronized keywords in methods like tryingToEat() and startEat() to make sure only one thread (philosopher) can execute the method at a time. 
 
 ### Deadlock 
-When a philosopher grabs the left fork and the neighboring two philosophers also grabs the left fork, none of the three philosophers can start eating since they all need a fork from each other. To avoid such a deadlock, we made sure each philosopher must pick up both the left fork and the right fork when they are able to eat. Either a philosopher is eating with both forks or thinking with both of their forks put down.
+When a philosopher grabs the left fork and the neighboring two philosophers also grab the left fork, none of the three philosophers can start eating since they all need a fork from each other. To avoid such a deadlock, we made sure each philosopher had to pick up both the left fork and the right fork when trying to eat. A philosopher is eating with both forks or thinking with both forks put down.
 
 ### Starvation
-Since every philosopher thinks for a random amount of time and then starts eating, it is possible that a philosopher always gets to eat with both forks while the others never have a chance to eat. To avoid starving philosophers, we used the Stack to store philosophers that are not able to eat, along with a spaghetti boolean array that keeps track of the philosophers that have eaten. For example, when one philosopher is eating, the left philosopher and right philosopher are not able to eat. Thus, they are put into the Stack to wait. Futhermore, if one philosopher has eaten the spaghetti (i.e., spaghetti become false), he/she is not allowed to eat again unless everyone else has finished eating their spaghetti. This philosopher is put into the Stack as well. When everyone is done eating, the entire spaghetti boolean array becomes true (i.e., spaghetti is refilled). Then, the cycle continues. This allows all philosophers to have eaten the spaghetti without starving anybody.
+Since every philosopher thinks for a random amount of time and then starts eating, a philosopher may always get to eat with both forks while the others never have a chance to eat. To avoid starving philosophers, we used the Stack to store philosophers who are not able to eat, along with a spaghetti boolean array that keeps track of the philosophers who have eaten. For example, when one philosopher is eating, the left philosopher and the right philosopher cannot eat. Thus, they are put into the Stack to wait. Furthermore, if one philosopher has eaten the spaghetti (i.e., spaghetti becomes false), he/she is not allowed to eat again unless everyone else has finished eating their spaghetti. This philosopher is put into the Stack as well. When everyone is done eating, the entire spaghetti boolean array becomes true (i.e., spaghetti is refilled). Then, the cycle continues. This allows all philosophers to have eaten the spaghetti without starving anybody.
