@@ -22,12 +22,15 @@ In this assignment, we will represent the fork, the spaghetti, the table, and th
         - putDownFork()
         - isInUse()
 
+
 2. Spaghetti - Boolean array
     - true: Spaghetti has not been eaten.
     - false: Spaghetti has been eaten.
 
+
 3. Table 
     - All five philosophers.
+
 
 4. Philosopher - Java Class extends Thread
     - Fields: 
