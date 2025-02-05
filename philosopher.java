@@ -1,5 +1,4 @@
 // Philosopher.java
-
 import java.util.Stack;
 
 public class Philosopher extends Thread {
